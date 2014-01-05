@@ -111,6 +111,8 @@ class piece:
 
 		"""
 		if axis == 0:
+			if degree == 0:
+				return self
 			if degree == 90:
 				return self.rot90(0)
 			elif degree == 180:
@@ -120,6 +122,8 @@ class piece:
 			else:
 				raise ValueError("only rotations of 90, 180, or 270 degrees are allowed")
 		if axis == 1:
+			if degree == 0:
+				return self
 			if degree == 90:
 				return self.rot90(1)
 			elif degree == 180:
@@ -129,6 +133,8 @@ class piece:
 			else:
 				raise ValueError("only rotations of 90, 180, or 270 degrees are allowed")
 		if axis == 2:
+			if degree == 0:
+				return self
 			if degree == 90:
 				return self.rot90(2)
 			elif degree == 180:
@@ -139,3 +145,20 @@ class piece:
 				raise ValueError("only rotations of 90, 180, or 270 degrees are allowed")
 		else:
 			raise ValueError("axis must be 0, 1, or 2")
+
+pieces = {}
+for i in os.listdir('.'):
+	if i.count('piece'):
+		pieces[int(i.split('piece')[1].split('.dat')[0])]={'p0':piece(filename=i)}
+cumsum=0
+for i in pieces:
+	pieces[i]['ori'] = []
+	#rotate about axis 1 to access all four faces
+	for j in [0,90,180,270]:
+		P=pieces[i]['p0'].rotate(1,j)
+		for k in [0,90,180,270]:
+			pieces[i]['ori'].append(P.rotate(0,k))
+	for j in [90,270]:
+		P=pieces[i]['p0'].rotate(2,j)
+		for k in [0,90,180,270]:
+			pieces[i]['ori'].append(P.rotate(0,k))
