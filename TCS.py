@@ -79,7 +79,20 @@ class piece:
 			for j in np.arange(0,s[2]):
 				frontstr = frontstr+"%d"%(A[i,:,j].max())
 			string = string + "%5s\n"%(frontstr)
-		return string
+		return string+'\n'
+
+	def rot90(self,axis):
+		"""
+		returns a copy of the called piece rotated by 90 degrees around axis.
+		"""
+		if axis == 0:
+			return piece(shape=self.shape.transpose(0,2,1)[:,:,::-1])
+		elif axis == 1:
+			return piece(shape=self.shape.transpose(1,0,2)[::-1,:,:])
+		elif axis == 2:
+			return piece(shape=self.shape.transpose(2,1,0)[::-1,:,:])
+		else:
+			raise ValueError("axis must be 0, 1, or 2")
 
 	def rotate(self, axis, degree):
 		"""
@@ -88,32 +101,41 @@ class piece:
 		returns the rotated piece
 
 		Parameters: 
-			degree: 0	 90deg rotation
-				1	180deg rotation	
-				2	270deg rotation
-
 			axis:	0	around z
 				1	around x
 				2	around y
+
+			degree: 90	 90deg rotation
+				180	180deg rotation	
+				270	270deg rotation
+
 		"""
 		if axis == 0:
 			if degree == 90:
-				return piece(shape=self.shape.transpose(0,1,2)[:,:,::-1])
+				return self.rot90(0)
 			elif degree == 180:
-				return piece(shape=self.shape.transpose(0,1,2)[:,:,::-1].transpose(0,1,2)[:,:,::-1])
+				return self.rotate(0,90).rotate(0,90)
 			elif degree == 270:
-				return piece(shape=self.shape.transpose(0,1,2)[:,::-1,:])
+				return self.rotate(0,90).rotate(0,90).rotate(0,90)
 			else:
 				raise ValueError("only rotations of 90, 180, or 270 degrees are allowed")
-		elif axis == 1:
-			return self.shape #placeholder
-		elif axis == 2:
-			return self.shape #placeholder
+		if axis == 1:
+			if degree == 90:
+				return self.rot90(1)
+			elif degree == 180:
+				return self.rotate(1,90).rotate(1,90)
+			elif degree == 270:
+				return self.rotate(1,90).rotate(1,90).rotate(1,90)
+			else:
+				raise ValueError("only rotations of 90, 180, or 270 degrees are allowed")
+		if axis == 2:
+			if degree == 90:
+				return self.rot90(2)
+			elif degree == 180:
+				return self.rotate(2,90).rotate(2,90)
+			elif degree == 270:
+				return self.rotate(2,90).rotate(2,90).rotate(2,90)
+			else:
+				raise ValueError("only rotations of 90, 180, or 270 degrees are allowed")
 		else:
 			raise ValueError("axis must be 0, 1, or 2")
-
-	
-
-#p12 = piece(filename="piece12.dat")
-#print p12
-#print p12.rotate(0,1)
