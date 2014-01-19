@@ -1,5 +1,7 @@
 #!/opt/local/bin/python
 import os
+import itertools
+import time
 import numpy as np
 from pieces import piece
 
@@ -31,38 +33,18 @@ for i in pieces:
 		pieces[i]['confs'].extend(j.PadWithZeros())
 
 print "finding solutions"
-n = len(pieces.keys())
-count= np.zeros(n,int)
-maxcount= np.zeros(n,int)
-prod = 1.0
-for n,i in enumerate(pieces):
-	maxcount[n] = len(pieces[i]['confs'])
-	prod = prod * maxcount[n]
-
-print maxcount, prod
-def IterateCount(count, maxcount, n):
-	try:
-		count[n]= count[n]+1
-		if count[n] ==  maxcount[n]:
-			count[n]=0
-			IterateCount(count,maxcount,n+1) #overflow
-	except IndexError: #are we done?
-		return True
-	
-solutions={}
-SolCount=0
-while True:
+pool = []
+for i in pieces:
+	pool.append(pieces[i]['confs'])
+SolCount = 0
+for i in itertools.product(*pool):
 	S = piece()
-	for n,i in enumerate(pieces):
-		S = S+pieces[i]['confs'][count[n]]
-		if S.shape.max() > 1:
-			break
+	for j in i:
+		S=S+j
 	if (S.shape.min() == 1 and S.shape.max() == 1):
 		Sout=np.zeros((4,4,4),int)
 		print "Solution #%d"%(SolCount)
 		for n,i in enumerate(pieces):
-			Sout = Sout + i*pieces[i]['confs'][count[n]]
-			print pieces[i]['confs'][count[n]]
+			Sout = Sout + i*pieces[i]['confs'][count[n]].shape
 		SolCount = SolCount + 1
-	if IterateCount(count, maxcount, 0):
-		break
+		print Sout
